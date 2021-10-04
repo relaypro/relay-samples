@@ -2,7 +2,10 @@
   "name": "@relaypro/samples",
   "version": "1.0.0",
   "description": "Samples for Relay Pro SDK",
-  "repository": "github:relaypro/relay-samples",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/relaypro/relay-samples.git"
+  },
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -11,7 +14,12 @@
   "author": "Brandon Smith <bsmith@republicwireless.com> (https://relaypro.com/)",
   "license": "MIT",
   "dependencies": {
-    "@relaypro/sdk": "1.0.1"
+    "@relaypro/sdk": "^1.0.1",
+    "twilio": "^3.60.0"
   },
-  "type": "module"
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/relaypro/relay-samples/issues"
+  },
+  "homepage": "https://github.com/relaypro/relay-samples#readme"
 }

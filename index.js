@@ -1,16 +1,15 @@
 import { relay } from '@relaypro/sdk'
-
 import helloworld from './workflows/helloworld.js'
 import deviceinfo from './workflows/deviceinfo.js'
 import interval from './workflows/interval.js'
 import notification from './workflows/notification.js'
 import vibrate from './workflows/vibrate.js'
-import twilio from './workflows/twilio.js'
+import coffee from './workflows/coffee.js'
+import timer from './workflows/timer.js'
 import axios from 'axios'
 import querystring from 'querystring'
 import express from 'express'
 
-export const eventEmitter = new EventEmitter()
 export const wfs = []
 
 const express1 = express()
@@ -26,8 +25,11 @@ express1.post('/msg', (req, res) => {
   res.send("Received")
 })
 
+const server = express1.listen(port, () => {
+  console.log(`express listening on ${port}`)
+})
 
-const app = relay()
+const app = relay({server})
 
 // "named" workflows must match the WS path
 // e.g. wss://host:port/helloworld
@@ -36,7 +38,9 @@ app.workflow(`deviceinfo`, deviceinfo)
 app.workflow(`interval`, interval)
 app.workflow(`notification`, notification)
 app.workflow(`vibrate`, vibrate)
-app.workflow(`twilio`, twilio)
+app.workflow(`coffee`, coffee)
+app.workflow(`timer`, timer)
+
 
 // only one "un-named" workflow allowed...
 // e.g. wss://host:port/
