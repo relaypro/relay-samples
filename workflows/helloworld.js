@@ -7,7 +7,7 @@ export default createWorkflow(relay => {
     const name = await relay.getDeviceName()
     await relay.say(`What is your name ?`)
     const user = await relay.listen()
-    await relay.say(`Hello ${user}, from ${name}`)
+    await relay.say(`Hello ${user}, from ${name.text}`)
     await relay.terminate()
   })
 })
