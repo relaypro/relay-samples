@@ -1,32 +1,44 @@
 
-const createApp = (relay) => {
-  relay.on(`start`, async () => {
+import pkg from '@relaypro/sdk'
+const { Event, createWorkflow, Uri } = pkg
+
+export default createWorkflow(relay => {
+  relay.on(Event.START, async (event) => {
+    const { trigger: { args: { source_uri: originator } } } = event
     await relay.setVar(`tick_num`, 1)
-    await relay.startTimer(await relay.getVar(`interval`, 60))
-    relay.say(`starting timer`)
+    await relay.startTimer(await relay.getNumberVar(`interval`, 60))
+    await relay.startInteraction([originator], `interval timer`)
   })
 
-  relay.on(`button`, async (button, taps) => {
-    if (button === `action` && taps === `single`) {
-      await relay.say(`stopping timer`)
-      await relay.terminate()
-    } else {
-      relay.say(`dude ! stop pressing buttons`)
-    }
+  relay.on(Event.INTERACTION_STARTED, async ({ source_uri: interaction }) => {
+    await relay.setVar(`active_interaction`, interaction)
+    await relay.sayAndWait(interaction, `starting timer`)
   })
 
-  relay.on(`timer`, async () => {
-    let num = relay.getVar(`tick_num`)
-    const count = relay.getVar(`count`, 5)
+  relay.on(Event.TIMER, async () => {
+    let num = await relay.getNumberVar(`tick_num`)
+    let count = await relay.getNumberVar(`count`, 5)
+    let interaction = await relay.getVar(`active_interaction`)
 
-    if (num < count) {
-      await relay.say(`stopping timer`)
+    console.log(`timer event`, { num, count })
+
+    if (count <= num) {
+      await relay.sayAndWait(interaction, `stopping timer`)
       await relay.terminate()
     } else {
-      await relay.say(`${num}`)
+      await relay.sayAndWait(interaction, `${num}`)
       await relay.setVar(`tick_num`, ++num)
     }
   })
-}
 
-export default createApp
+  relay.on(Event.BUTTON, async ({ source_uri, button, taps }) => {
+    console.log(`button event`, { source_uri, button, taps })
+    if (button === `action` && taps === `single`) {
+      await relay.sayAndWait(source_uri, `stopping timer`)
+      await relay.terminate()
+    } else {
+      await relay.sayAndWait(source_uri, `dude ! stop pressing buttons`)
+    }
+  })
+
+})
