@@ -9,9 +9,9 @@ export default createWorkflow(relay => {
     const actualTargets = targets.split(`,`).map(Uri.deviceName)
     console.log(`broadcast workflow targets`, actualTargets)
     if (confirm) {
-      await relay.alert(BROADCAST_NAME, text, actualTargets)
+      await relay.alert(actualTargets, BROADCAST_NAME, text)
     } else {
-      await relay.broadcast(actualTargets, text)
+      await relay.broadcast(actualTargets, BROADCAST_NAME, text)
     }
     await relay.terminate()
   })
