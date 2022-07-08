@@ -1,43 +1,32 @@
 import pkg from '@relaypro/sdk'
-const { Event, Taps, Button, createWorkflow, NotificationOptions } = pkg
+const { Event, Taps, Button, createWorkflow, Uri } = pkg
 
-const createApp = (relay) => {
-  relay.on(Event.START, async () => {
+
+export default createWorkflow(relay=> {
+  relay.on(Event.START, async(event) => {
+    const { trigger: { args: { source_uri } } } = event
+    relay.startInteraction([source_uri], 'coffee')
+  })
+
+  relay.on(Event.INTERACTION_STARTED, async({source_uri: interaction}) => {
     try {
-      const location = await relay.getDeviceAddress()
-      console.log(location)
-      await relay.say(`Getting recipies for ${location}`)
-      await relay.say(`Are you preparing a Hot or cold drink?`)
-      const temp = await relay.listen(['hot','cold'])
-      await relay.say('What size?')
-      const size = await relay.listen(['tall','grande', 'venti'])
-      await relay.say(`Which drink would you like help with?`)
-      const drink = await relay.listen(['strawberry funnel cake frappuccino','Mocha Cookie crumble'])
-      console.log(size.text)
-      if (drink.text === 'strawberry funnel cake Frappuccino') {
-        await relay.say(`${size.text} - ${drink.text}`)
-        await relay.say('blend Ice, 10 ounces Milk, 3 pumps funnel cake syrup. Single tap once complete')
+      const deviceName = Uri.parseDeviceName(interaction)
+
+      await relay.say(interaction, `Getting recipies for ${deviceName}`)
+      await relay.say(interaction, `Which drink would you like help with?`)
+      const drink = await relay.listen(interaction, ['Latte','Frappuccino'])
+      await relay.say(interaction, `Preparing the recipe for a ${drink.text}`)
+      if (drink.text === 'Frappuccino') {
+        await relay.say(interaction, 'Blend ice, 10 ounces Milk, and a shot of espresso. Single tap when blended')
       }
     } catch (e) {
       console.error(e)
     } 
-  })    
-    
-  relay.on(Event.BUTTON, async (buttonEvent) => {
-    console.log(buttonEvent.taps)
-    console.log(buttonEvent.button)
-    if (buttonEvent.button === Button.ACTION) {
-      console.log(`action `)
-      if (buttonEvent.taps === Taps.SINGLE) {
-        console.log(`single `)
-        await relay.say('next, top with whipped cream, strawberry drizzle and funnel cake topping.')
-        await relay.terminate()
-      } else if (buttonEvent.taps === Taps.DOUBLE) { 
-        await relay.say(`Goodbye`)        
-        await relay.terminate()
-      }
-    }
-  })  
-}
-  
-  export default createApp
+  })
+
+  relay.on(Event.BUTTON, async ({ source_uri: interaction }) => {
+    console.log('INTERACTION URI: ' + interaction)
+    await relay.say(interaction, 'Next, top with whipped cream and chocolate drizzle.  Order complete')
+    await relay.terminate()
+  })
+})

@@ -5,6 +5,8 @@ import interval from './workflows/interval.js'
 import verifyLocation from './workflows/verify-location.js'
 import broadcast from './workflows/broadcast.js'
 import vibrate from './workflows/vibrate.js'
+import tranlste from './workflows/translate.js'
+import translate from './workflows/translate.js'
 
 const app = relay({
     subscriberId: `6aa4cf8f-cb49-483b-aca8-80b01a4c1e25`,
@@ -23,6 +25,7 @@ app.workflow(`interval`, interval)
 app.workflow(`verify-location`, verifyLocation)
 app.workflow(`broadcast`, broadcast)
 app.workflow(`vibrate`, vibrate)
+app.workflow('translate', translate)
 // app.workflow(`coffee`, coffee)
 //app.workflow(`timer`, timer)
 
